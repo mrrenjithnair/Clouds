@@ -3,23 +3,48 @@
 A dynamic photo-album site where each folder inside `Images/` becomes a floating cloud on the home page. Click a cloud → fly into a themed album view.
 
 ## Files
-- `index.html` — the whole app (home + trekking theme + lightbox + audio player)
+- `index.html` — the whole app (home + three themes + lightbox + audio player)
 - `data.js` — auto-generated manifest of albums (do not edit by hand)
-- `generate.sh` — re-scans `Images/` and rewrites `data.js`
-- `Images/<Folder Name>/` — drop your photos (and optional audio) here. The folder name becomes the cloud label.
+- `generate.sh` — re-scans `Images/`, converts HEIC → JPG, rewrites `data.js`
+- `start.sh` — local launcher (picks a port, opens the browser)
+- `CNAME` — custom domain for GitHub Pages
+- `.github/workflows/build.yml` — auto-rebuilds on push
+- `Images/<Folder Name>/` — drop your photos (and optional audio) here
 
-## Adding more memories
-1. Create a new folder inside `Images/` (the name = cloud label, e.g. `Beach 2025`).
-2. Drop in `.jpg`, `.jpeg`, `.png`, `.webp` images.
-3. Optionally drop in an `.mp3`, `.wav`, `.m4a`, or `.ogg` audio file — it plays in the vintage radio at the bottom of the album.
-4. Run `./generate.sh` in this folder. That's it — refresh the page.
+## Adding a new memory
+1. Create a folder inside `Images/` — the folder name becomes the cloud label.
+2. Drop in photos (`.jpg`, `.jpeg`, `.png`, `.webp`, `.heic`) and optionally one audio file (`.mp3`, `.wav`, `.m4a`, `.ogg`).
+3. (Optional) Create a tiny text file `.theme` inside the folder containing the theme name (e.g. `mumbai`). If you skip this, the folder gets the default **cloud** theme.
+4. Run `./generate.sh`. HEIC files get auto-converted to JPG next to the originals.
+5. Refresh the page.
 
 ## Themes
-The theme is picked automatically from the folder name (in `generate.sh`):
-- `trekking` (default) — matches names containing trek, camp, hike, mountain, valley, sandan
-- `beach`, `city` — placeholders ready for you to add more themes later
+Theme is read from `Images/<Folder>/.theme`. Built-in themes:
 
-For now only the `trekking` theme is implemented. New themes can be added later by extending `index.html`.
+| Theme name  | Vibe                                              |
+|-------------|---------------------------------------------------|
+| `cloud`     | Default. Sky + drifting clouds + polaroids.       |
+| `trekking`  | Night mountains, stars, moon, campfire, tents.    |
+| `mumbai`    | Marine Drive at dusk — skyline, sea, Queen's Necklace lights, scooter, chai, food, dog, movie reel. Movie-still photo frames. |
 
-## Opening it
-Double-click `index.html`. (If images don't load due to spaces in folder names, serve the folder with `python3 -m http.server` and open `http://localhost:8000`.)
+To add a new theme later, add a new `<section id="theme-yourname" class="view theme-page theme-yourname">` block in `index.html` with your own backdrop, then in the folder you want it for, create `.theme` containing `yourname`.
+
+## HEIC support
+`generate.sh` converts HEIC to JPG using the first available tool:
+1. `sips` (macOS, built-in)
+2. `heif-convert` (Linux: `apt install libheif-examples`)
+3. Python with `pillow-heif` (`pip install pillow-heif Pillow`) — most reliable cross-platform
+4. ImageMagick (`magick` or `convert`)
+
+The GitHub Action installs pillow-heif automatically.
+
+## Running locally
+- Double-click `start.sh`, or
+- `cd` here and run `python3 -m http.server 8000`, then visit `http://localhost:8000`.
+
+## Hosting on GitHub Pages
+1. `git init && git add . && git commit -m "memories" && git push origin main`
+2. Repo Settings → Pages → Source: `Deploy from a branch`, Branch: `main` / root
+3. Custom domain is already set to `clouds.mrrenjithnair.com` via the `CNAME` file. Add a CNAME DNS record `clouds → YOUR_USERNAME.github.io`.
+
+After that: drop new photos into `Images/`, `git push`, the GitHub Action regenerates everything, and the site updates within a minute.

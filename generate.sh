@@ -1,21 +1,63 @@
 #!/bin/bash
 # Regenerates data.js by scanning the Images folder.
-# Run this whenever you add/remove folders or images.
+# - Converts HEIC files to JPG (saved next to the original) so browsers can display them.
+# - Reads each folder's theme from an optional `.theme` file. Defaults to "cloud".
+#
+# HEIC conversion tries in order: sips (macOS built-in), heif-convert (libheif-examples),
+# pillow-heif (`pip install pillow-heif Pillow`), then ImageMagick.
 
 cd "$(dirname "$0")"
 IMAGES_DIR="./Images"
 OUTPUT="./data.js"
 
-# Theme map by folder name (case-insensitive keywords). Add more here later.
+convert_heic() {
+  local src="$1"
+  local dst="${src%.*}.jpg"
+  if [ -f "$dst" ] && [ "$dst" -nt "$src" ]; then
+    return 0
+  fi
+  echo "  Converting: $(basename "$src")" >&2
+
+  if command -v sips >/dev/null 2>&1; then
+    sips -s format jpeg "$src" --out "$dst" >/dev/null 2>&1 && return 0
+  fi
+
+  if command -v heif-convert >/dev/null 2>&1; then
+    heif-convert "$src" "$dst" >/dev/null 2>&1 && return 0
+  fi
+
+  if command -v python3 >/dev/null 2>&1; then
+    python3 - "$src" "$dst" <<'PYEOF' 2>/dev/null
+import sys
+try:
+    from pillow_heif import register_heif_opener
+    from PIL import Image
+    register_heif_opener()
+    Image.open(sys.argv[1]).convert('RGB').save(sys.argv[2], 'JPEG', quality=88)
+except Exception:
+    sys.exit(1)
+PYEOF
+    if [ $? -eq 0 ] && [ -f "$dst" ]; then return 0; fi
+  fi
+
+  if command -v magick >/dev/null 2>&1; then
+    magick "$src" "$dst" 2>/dev/null && [ -f "$dst" ] && return 0
+  fi
+  if command -v convert >/dev/null 2>&1; then
+    convert "$src" "$dst" 2>/dev/null && [ -f "$dst" ] && return 0
+  fi
+
+  echo "  WARNING: failed to convert $src — install pillow-heif: pip install pillow-heif Pillow" >&2
+  return 1
+}
+
 get_theme() {
-  local name_lower
-  name_lower=$(echo "$1" | tr '[:upper:]' '[:lower:]')
-  case "$name_lower" in
-    *trek*|*camp*|*hike*|*mountain*|*valley*|*sandan*) echo "trekking" ;;
-    *beach*|*sea*|*ocean*) echo "beach" ;;
-    *city*|*urban*) echo "city" ;;
-    *) echo "trekking" ;;  # default while only trekking theme is built
-  esac
+  local folder="$1"
+  if [ -f "$folder.theme" ]; then
+    tr -d '[:space:]' < "$folder.theme"
+  else
+    echo "cloud"
+  fi
 }
 
 {
@@ -24,21 +66,25 @@ get_theme() {
   for folder in "$IMAGES_DIR"/*/; do
     [ -d "$folder" ] || continue
     folder_name=$(basename "$folder")
-    theme=$(get_theme "$folder_name")
+    theme=$(get_theme "$folder")
+    echo "Folder: $folder_name  →  theme: $theme" >&2
+
+    shopt -s nullglob nocaseglob
+    for heic in "$folder"*.heic; do
+      convert_heic "$heic"
+    done
+    shopt -u nocaseglob
+
     echo "  {"
     echo "    name: \"$folder_name\","
     echo "    theme: \"$theme\","
     echo "    images: ["
-    # Collect images
-    shopt -s nullglob nocaseglob
+    shopt -s nocaseglob
     for img in "$folder"*.jpg "$folder"*.jpeg "$folder"*.png "$folder"*.gif "$folder"*.webp; do
       img_name=$(basename "$img")
-      # Skip hidden/system files
       [[ "$img_name" == .* ]] && continue
       echo "      \"Images/$folder_name/$img_name\","
     done
-    echo "    ],"
-    # Find first audio file (if any)
     audio_path="null"
     for aud in "$folder"*.mp3 "$folder"*.wav "$folder"*.m4a "$folder"*.ogg; do
       aud_name=$(basename "$aud")
@@ -47,10 +93,11 @@ get_theme() {
       break
     done
     shopt -u nullglob nocaseglob
+    echo "    ],"
     echo "    audio: $audio_path"
     echo "  },"
   done
   echo "];"
 } > "$OUTPUT"
 
-echo "Wrote $OUTPUT"
+echo "Wrote $OUTPUT" >&2

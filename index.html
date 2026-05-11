@@ -6,19 +6,17 @@
 <title>Memories on the Cloud</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Pacifico&family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Pacifico&family=Playfair+Display:ital,wght@0,500;0,700;1,500;1,700&family=Quicksand:wght@400;600&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
   /* ==========================================================
-     Core
+     CORE
      ========================================================== */
   *, *::before, *::after { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
   body {
     font-family: 'Quicksand', system-ui, sans-serif;
-    color: #1d2535;
-    background: #cfe9ff;
-    -webkit-font-smoothing: antialiased;
-    user-select: none;
+    color: #1d2535; background: #cfe9ff;
+    -webkit-font-smoothing: antialiased; user-select: none;
   }
   button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
   img { display: block; max-width: 100%; }
@@ -31,89 +29,81 @@
   }
   .view.active { opacity: 1; visibility: visible; }
 
+  /* Shared album shell ------------------------------------------------ */
+  .theme-page .scene { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .theme-page .album-header {
+    position: relative; z-index: 3;
+    padding: 38px 50px 18px;
+    display: flex; align-items: center; justify-content: space-between; gap: 24px;
+    flex-wrap: wrap;
+  }
+  .theme-page .album-title { margin: 0; line-height: 1; }
+  .theme-page .album-subtitle { margin: 6px 0 0; opacity: .85; }
+  .theme-page .gallery {
+    position: relative; z-index: 3;
+    padding: 10px 50px 160px;
+    height: calc(100% - 110px);
+    overflow-y: auto; overflow-x: hidden;
+    scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.3) transparent;
+  }
+  .theme-page .gallery::-webkit-scrollbar { width: 10px; }
+  .theme-page .gallery::-webkit-scrollbar-thumb { background: rgba(255,255,255,.25); border-radius: 10px; }
+  .theme-page .gallery-grid { columns: 4 280px; column-gap: 26px; }
+  @media (max-width: 1100px) { .theme-page .gallery-grid { columns: 3 240px; } }
+  @media (max-width: 720px)  { .theme-page .gallery-grid { columns: 2 180px; } }
+
+  /* Entrance animation */
+  .theme-page.active .album-header,
+  .theme-page.active .gallery,
+  .theme-page.active .radio {
+    animation: rise-in .9s ease both;
+  }
+  .theme-page.active .gallery { animation-delay: .12s; }
+  .theme-page.active .radio { animation-delay: .24s; }
+  @keyframes rise-in {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
   /* ==========================================================
-     HOME — Sky + Clouds
+     HOME — Sky + Memory Clouds
      ========================================================== */
   #home {
     background:
       radial-gradient(ellipse at 80% 15%, #fff5c8 0%, rgba(255,245,200,0) 45%),
       linear-gradient(180deg, #4ea7e8 0%, #88c8f0 38%, #c7e6f7 72%, #f4e8c6 100%);
   }
-
-  /* Sun */
   .sun {
-    position: absolute;
-    top: 6%; right: 9%;
+    position: absolute; top: 6%; right: 9%;
     width: 140px; height: 140px;
     background: radial-gradient(circle, #fff7c0 0%, #ffe27a 45%, rgba(255,200,80,0) 70%);
-    border-radius: 50%;
-    filter: blur(1px);
-    pointer-events: none;
+    border-radius: 50%; filter: blur(1px); pointer-events: none;
     animation: sun-pulse 8s ease-in-out infinite;
   }
-  @keyframes sun-pulse {
-    0%,100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.06); opacity: .92; }
-  }
+  @keyframes sun-pulse { 0%,100% { transform: scale(1); opacity:1; } 50% { transform: scale(1.06); opacity:.92; } }
 
-  /* Distant birds */
-  .bird {
-    position: absolute;
-    color: rgba(40,60,90,.45);
-    font-size: 14px;
-    animation: bird-fly 28s linear infinite;
-    pointer-events: none;
-  }
-  @keyframes bird-fly {
-    from { transform: translateX(-10vw); }
-    to { transform: translateX(110vw); }
-  }
+  .bird { position: absolute; color: rgba(40,60,90,.45); font-size: 14px; animation: bird-fly 28s linear infinite; pointer-events: none; }
+  @keyframes bird-fly { from { transform: translateX(-10vw); } to { transform: translateX(110vw); } }
 
-  /* Ambient drifting background clouds (decorative only) */
   .ambient-cloud {
-    position: absolute;
-    width: 220px; height: 70px;
-    background: #ffffff;
-    border-radius: 60px;
-    opacity: .85;
-    filter: blur(.4px);
+    position: absolute; width: 220px; height: 70px;
+    background: #ffffff; border-radius: 60px;
+    opacity: .85; filter: blur(.4px);
     box-shadow: inset -16px -8px 32px rgba(180, 210, 235, .35);
-    pointer-events: none;
-    animation: drift 60s linear infinite;
+    pointer-events: none; animation: drift 60s linear infinite;
   }
-  .ambient-cloud::before,
-  .ambient-cloud::after {
-    content: '';
-    position: absolute;
-    background: inherit;
-    border-radius: 50%;
-  }
-  .ambient-cloud::before {
-    width: 110px; height: 110px;
-    top: -55px; left: 30px;
-  }
-  .ambient-cloud::after {
-    width: 80px; height: 80px;
-    top: -35px; right: 30px;
-  }
-  @keyframes drift {
-    from { transform: translateX(-30vw); }
-    to { transform: translateX(130vw); }
-  }
+  .ambient-cloud::before, .ambient-cloud::after { content:''; position:absolute; background:inherit; border-radius:50%; }
+  .ambient-cloud::before { width:110px; height:110px; top:-55px; left:30px; }
+  .ambient-cloud::after { width:80px; height:80px; top:-35px; right:30px; }
+  @keyframes drift { from { transform: translateX(-30vw); } to { transform: translateX(130vw); } }
 
   .home-title {
-    position: absolute;
-    top: 6.5vh; left: 0; right: 0;
-    text-align: center;
-    z-index: 5;
-    pointer-events: none;
+    position: absolute; top: 6.5vh; left: 0; right: 0;
+    text-align: center; z-index: 5; pointer-events: none;
   }
   .home-title h1 {
-    font-family: 'Pacifico', cursive;
-    font-weight: 400;
-    font-size: clamp(36px, 6vw, 68px);
-    margin: 0;
-    color: #ffffff;
+    font-family: 'Pacifico', cursive; font-weight: 400;
+    font-size: clamp(36px, 6vw, 68px); margin: 0; color: #fff;
     text-shadow: 0 4px 24px rgba(60, 100, 150, .35), 0 1px 0 rgba(255,255,255,.6);
     letter-spacing: 1px;
   }
@@ -121,64 +111,36 @@
     font-family: 'Caveat', cursive;
     font-size: clamp(18px, 2vw, 26px);
     color: rgba(255,255,255,.95);
-    text-shadow: 0 2px 12px rgba(60, 100, 150, .25);
+    text-shadow: 0 2px 12px rgba(60,100,150,.25);
     margin: 6px 0 0;
   }
 
-  /* The memory cloud grid */
   .cloud-stage {
-    position: absolute;
-    inset: 22vh 0 8vh 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 60px 80px;
-    padding: 0 6vw;
-    z-index: 4;
+    position: absolute; inset: 22vh 0 8vh 0;
+    display: flex; align-items: center; justify-content: center;
+    flex-wrap: wrap; gap: 60px 80px; padding: 0 6vw; z-index: 4;
   }
   .memory-cloud {
-    position: relative;
-    width: 280px; height: 150px;
+    position: relative; width: 280px; height: 150px;
     cursor: pointer;
     transition: transform .5s cubic-bezier(.2,.7,.3,1.4), filter .5s ease;
     animation: float 6s ease-in-out infinite;
   }
-  .memory-cloud:nth-child(odd)  { animation-duration: 7.2s; }
-  .memory-cloud:nth-child(3n)   { animation-duration: 5.4s; }
-  @keyframes float {
-    0%,100% { transform: translateY(0); }
-    50%     { transform: translateY(-12px); }
-  }
+  .memory-cloud:nth-child(odd) { animation-duration: 7.2s; }
+  .memory-cloud:nth-child(3n)  { animation-duration: 5.4s; }
+  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
 
-  .memory-cloud .cloud-svg {
-    position: absolute; inset: 0;
-    width: 100%; height: 100%;
-    filter: drop-shadow(0 18px 30px rgba(60, 100, 150, .35));
-  }
+  .memory-cloud .cloud-svg { position: absolute; inset: 0; width: 100%; height: 100%; filter: drop-shadow(0 18px 30px rgba(60,100,150,.35)); }
   .memory-cloud .cloud-label {
-    position: absolute;
-    inset: 0;
+    position: absolute; inset: 0;
     display: flex; align-items: center; justify-content: center;
-    text-align: center;
-    padding: 0 30px;
-    font-family: 'Playfair Display', serif;
-    font-style: italic;
-    font-weight: 700;
+    text-align: center; padding: 0 30px;
+    font-family: 'Playfair Display', serif; font-style: italic; font-weight: 700;
     font-size: clamp(20px, 1.6vw, 26px);
-    color: #2c4063;
-    text-shadow: 0 1px 0 rgba(255,255,255,.7);
-    letter-spacing: .3px;
+    color: #2c4063; text-shadow: 0 1px 0 rgba(255,255,255,.7); letter-spacing: .3px;
   }
-  .memory-cloud:hover {
-    transform: translateY(-10px) scale(1.05);
-    filter: brightness(1.04);
-  }
-  .memory-cloud:hover .cloud-svg {
-    filter: drop-shadow(0 26px 40px rgba(60, 100, 150, .45));
-  }
-
-  /* Cloud zoom-out transition when clicked */
+  .memory-cloud:hover { transform: translateY(-10px) scale(1.05); filter: brightness(1.04); }
+  .memory-cloud:hover .cloud-svg { filter: drop-shadow(0 26px 40px rgba(60,100,150,.45)); }
   .memory-cloud.zooming {
     animation: cloud-zoom 0.9s forwards cubic-bezier(.55,.08,.4,1.0);
     z-index: 99;
@@ -189,33 +151,113 @@
     100% { transform: translateY(-100px) scale(8); opacity: 0; }
   }
 
-  /* Footer hint */
   .home-hint {
-    position: absolute;
-    bottom: 26px; left: 0; right: 0;
-    text-align: center;
-    font-family: 'Caveat', cursive;
-    color: rgba(40,70,110,.8);
-    font-size: 22px;
-    z-index: 4;
-    pointer-events: none;
+    position: absolute; bottom: 26px; left: 0; right: 0;
+    text-align: center; font-family: 'Caveat', cursive;
+    color: rgba(40,70,110,.8); font-size: 22px; z-index: 4; pointer-events: none;
   }
 
   /* ==========================================================
-     TREKKING THEME
+     POLAROID base (shared, themes may override)
      ========================================================== */
-  #trekking {
-    background: linear-gradient(180deg, #0b1e3a 0%, #1d3b66 40%, #4a6a8f 70%, #6a5a3f 100%);
+  .polaroid {
+    break-inside: avoid;
+    background: #fdfaf2;
+    padding: 12px 12px 42px;
+    margin: 0 0 26px;
+    box-shadow: 0 10px 24px rgba(0,0,0,.35), 0 1px 0 rgba(255,255,255,.6) inset;
+    transform: rotate(var(--rot, -1deg));
+    transition: transform .35s ease, box-shadow .35s ease;
+    cursor: pointer; position: relative;
+  }
+  .polaroid:hover { transform: rotate(0deg) scale(1.03); box-shadow: 0 18px 36px rgba(0,0,0,.5); z-index: 4; }
+  .polaroid img { width: 100%; height: auto; background: #ddd; display: block; }
+  .polaroid .caption {
+    position: absolute; bottom: 8px; left: 12px; right: 12px;
+    text-align: center; font-family: 'Caveat', cursive;
+    color: #5c4a32; font-size: 18px; line-height: 1; pointer-events: none;
+  }
+  .polaroid::before {
+    content: ''; position: absolute; top: -10px; left: 50%;
+    transform: translateX(-50%) rotate(-3deg);
+    width: 70px; height: 22px;
+    background: rgba(255,240,180,.55);
+    box-shadow: 0 2px 6px rgba(0,0,0,.15);
   }
 
-  /* Scenic backdrop layer */
-  .scene {
-    position: absolute; inset: 0;
-    pointer-events: none;
-    overflow: hidden;
+  /* ==========================================================
+     SHARED — Back button (sign style)
+     ========================================================== */
+  .back-btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: linear-gradient(180deg, #8a5a30, #6b4220);
+    color: #fff8e0;
+    font-family: 'Caveat', cursive; font-size: 22px;
+    padding: 10px 22px; border-radius: 26px;
+    box-shadow: 0 6px 0 #4a2b13, 0 10px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.2);
+    transition: transform .15s ease, box-shadow .15s ease;
   }
-  .stars {
-    position: absolute; inset: 0;
+  .back-btn:hover { transform: translateY(-2px); }
+  .back-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #4a2b13, 0 4px 12px rgba(0,0,0,.35); }
+
+  /* Vintage radio (audio) — base, themes may override */
+  .radio {
+    position: fixed; bottom: 22px; right: 22px; z-index: 6;
+    background: linear-gradient(180deg, #5a3a1c, #3a230f);
+    border-radius: 18px; padding: 14px 18px;
+    color: #fff8e0; display: flex; align-items: center; gap: 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.15);
+    border: 2px solid #2a1a0a; max-width: 90vw;
+  }
+  .radio .speaker {
+    width: 36px; height: 36px; border-radius: 50%;
+    background:
+      radial-gradient(circle, #1a0e04 38%, transparent 40%),
+      repeating-radial-gradient(circle, #1a0e04 0 1px, transparent 1px 4px),
+      #c19a5b;
+    border: 3px solid #2a1a0a;
+    box-shadow: inset 0 0 8px rgba(0,0,0,.5);
+  }
+  .radio .play-btn {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: linear-gradient(180deg, #d8a655, #a87637);
+    color: #2a1a0a; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 3px 0 #5a3a1c, inset 0 1px 0 rgba(255,255,255,.4);
+    font-size: 16px;
+  }
+  .radio .title { font-family: 'Caveat', cursive; font-size: 18px; line-height: 1; color: #ffe9b8; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* ==========================================================
+     THEME — CLOUD (default)
+     ========================================================== */
+  .theme-cloud {
+    background:
+      radial-gradient(ellipse at 80% 15%, #fff5c8 0%, rgba(255,245,200,0) 45%),
+      linear-gradient(180deg, #5cb1ec 0%, #8fcaf1 38%, #d0e6f7 72%, #f4e8c6 100%);
+  }
+  .theme-cloud .album-title {
+    font-family: 'Pacifico', cursive;
+    font-size: clamp(38px, 4.5vw, 60px);
+    color: #fff;
+    text-shadow: 0 3px 18px rgba(60,100,150,.35);
+  }
+  .theme-cloud .album-subtitle {
+    font-family: 'Caveat', cursive; font-size: 22px;
+    color: rgba(255,255,255,.92);
+  }
+  /* Cloud-themed polaroid: bluish tint to feel airy */
+  .theme-cloud .polaroid { background: #fff; }
+  .theme-cloud .polaroid .caption { color: #4a6480; font-style: italic; }
+  .theme-cloud .polaroid::before { background: rgba(180,210,235,.65); }
+
+  /* ==========================================================
+     THEME — TREKKING
+     ========================================================== */
+  .theme-trekking {
+    background: linear-gradient(180deg, #0b1e3a 0%, #1d3b66 40%, #4a6a8f 70%, #6a5a3f 100%);
+  }
+  .theme-trekking .stars {
+    position: absolute; inset: 0; height: 50%;
     background-image:
       radial-gradient(1px 1px at 12% 15%, #fff 50%, transparent 100%),
       radial-gradient(1px 1px at 24% 28%, #fff 50%, transparent 100%),
@@ -227,284 +269,220 @@
       radial-gradient(1px 1px at 18% 6%, #fff 50%, transparent 100%),
       radial-gradient(1px 1px at 44% 30%, #fff 50%, transparent 100%),
       radial-gradient(1px 1px at 6% 22%, #fff 50%, transparent 100%);
-    opacity: .85;
-    animation: twinkle 4s ease-in-out infinite;
-    height: 50%;
+    opacity: .85; animation: twinkle 4s ease-in-out infinite;
   }
-  @keyframes twinkle {
-    0%,100% { opacity: .85; }
-    50%     { opacity: .55; }
-  }
-  .moon {
-    position: absolute;
-    top: 8%; left: 10%;
-    width: 80px; height: 80px;
-    border-radius: 50%;
+  @keyframes twinkle { 0%,100% { opacity: .85; } 50% { opacity: .55; } }
+  .theme-trekking .moon {
+    position: absolute; top: 8%; left: 10%;
+    width: 80px; height: 80px; border-radius: 50%;
     background: radial-gradient(circle at 35% 35%, #fff8e0, #e7d8a5 60%, #c5b687);
-    box-shadow: 0 0 60px rgba(255, 240, 200, .35);
+    box-shadow: 0 0 60px rgba(255,240,200,.35);
   }
-
-  .scene svg.mountains {
-    position: absolute;
-    bottom: 0; left: 0; width: 100%; height: 65%;
+  .theme-trekking .campfire {
+    position: absolute; left: 5%; bottom: 8%;
+    width: 90px; height: 90px; z-index: 2;
   }
-
-  /* Campfire */
-  .campfire {
-    position: absolute;
-    left: 5%; bottom: 8%;
-    width: 90px; height: 90px;
-    z-index: 2;
-  }
-  .flame {
-    position: absolute;
-    bottom: 18px; left: 50%;
-    transform: translateX(-50%);
+  .theme-trekking .flame {
+    position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%);
     width: 26px; height: 50px;
     border-radius: 50% 50% 35% 35% / 60% 60% 40% 40%;
     background: radial-gradient(circle at 50% 80%, #fff3a5, #ffb13a 45%, #d8451e 80%);
-    filter: blur(.4px);
-    animation: flicker 1.2s ease-in-out infinite;
-    box-shadow: 0 0 22px rgba(255, 140, 40, .65);
+    filter: blur(.4px); animation: flicker 1.2s ease-in-out infinite;
+    box-shadow: 0 0 22px rgba(255,140,40,.65);
   }
-  .flame.s2 { width: 18px; height: 40px; bottom: 22px; animation-duration: .9s; opacity: .85; }
-  @keyframes flicker {
-    0%,100% { transform: translateX(-50%) scaleY(1) scaleX(1); }
-    50%     { transform: translateX(-50%) scaleY(1.1) scaleX(.9); }
-  }
-  .logs {
-    position: absolute;
-    bottom: 4px; left: 50%; transform: translateX(-50%);
+  .theme-trekking .flame.s2 { width: 18px; height: 40px; bottom: 22px; animation-duration: .9s; opacity: .85; }
+  @keyframes flicker { 0%,100% { transform: translateX(-50%) scaleY(1) scaleX(1); } 50% { transform: translateX(-50%) scaleY(1.1) scaleX(.9); } }
+  .theme-trekking .logs {
+    position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%);
     width: 60px; height: 14px;
     background: linear-gradient(180deg, #6c4023, #3a230f);
-    border-radius: 4px;
-    box-shadow: 0 0 22px rgba(255, 140, 40, .35);
+    border-radius: 4px; box-shadow: 0 0 22px rgba(255,140,40,.35);
+  }
+  .theme-trekking .album-title {
+    color: #fff; font-family: 'Caveat', cursive;
+    font-size: clamp(38px, 4.5vw, 60px); text-shadow: 0 3px 18px rgba(0,0,0,.4);
+  }
+  .theme-trekking .album-subtitle {
+    color: rgba(255,255,255,.8); font-family: 'Playfair Display', serif;
+    font-style: italic; font-size: 16px; letter-spacing: 1px;
   }
 
-  /* Header for album */
-  .album-header {
-    position: relative;
-    z-index: 3;
-    padding: 38px 60px 22px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 24px;
-  }
-  .album-title {
-    color: #fff;
-    font-family: 'Caveat', cursive;
-    font-size: clamp(38px, 4.5vw, 60px);
-    line-height: 1;
-    margin: 0;
-    text-shadow: 0 3px 18px rgba(0,0,0,.4);
-  }
-  .album-subtitle {
-    color: rgba(255,255,255,.8);
-    font-family: 'Playfair Display', serif;
-    font-style: italic;
-    font-size: 16px;
-    margin: 6px 0 0;
-    letter-spacing: 1px;
-  }
-
-  .back-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    background: linear-gradient(180deg, #8a5a30, #6b4220);
-    color: #fff8e0;
-    font-family: 'Caveat', cursive;
-    font-size: 22px;
-    padding: 10px 22px;
-    border-radius: 26px;
-    box-shadow:
-      0 6px 0 #4a2b13,
-      0 10px 24px rgba(0,0,0,.35),
-      inset 0 1px 0 rgba(255,255,255,.2);
-    transition: transform .15s ease, box-shadow .15s ease;
-  }
-  .back-btn:hover { transform: translateY(-2px); }
-  .back-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #4a2b13, 0 4px 12px rgba(0,0,0,.35); }
-
-  /* Photo gallery — scrapbook style */
-  .gallery {
-    position: relative;
-    z-index: 3;
-    padding: 10px 50px 160px;
-    height: calc(100% - 110px);
-    overflow-y: auto;
-    overflow-x: hidden;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255,255,255,.3) transparent;
-  }
-  .gallery::-webkit-scrollbar { width: 10px; }
-  .gallery::-webkit-scrollbar-thumb { background: rgba(255,255,255,.25); border-radius: 10px; }
-  .gallery-grid {
-    columns: 4 280px;
-    column-gap: 26px;
-  }
-  @media (max-width: 1100px) { .gallery-grid { columns: 3 240px; } }
-  @media (max-width: 720px)  { .gallery-grid { columns: 2 180px; } }
-
-  .polaroid {
-    break-inside: avoid;
-    background: #fdfaf2;
-    padding: 12px 12px 42px;
-    margin: 0 0 26px;
-    box-shadow:
-      0 10px 24px rgba(0,0,0,.35),
-      0 1px 0 rgba(255,255,255,.6) inset;
-    transform: rotate(var(--rot, -1deg));
-    transition: transform .35s ease, box-shadow .35s ease;
-    cursor: pointer;
-    position: relative;
-  }
-  .polaroid:hover {
-    transform: rotate(0deg) scale(1.03);
-    box-shadow: 0 18px 36px rgba(0,0,0,.5);
-    z-index: 4;
-  }
-  .polaroid img {
-    width: 100%;
-    height: auto;
-    background: #ddd;
-    display: block;
-  }
-  .polaroid .caption {
-    position: absolute;
-    bottom: 8px; left: 12px; right: 12px;
-    text-align: center;
-    font-family: 'Caveat', cursive;
-    color: #5c4a32;
-    font-size: 18px;
-    line-height: 1;
-    pointer-events: none;
-  }
-  .polaroid::before {
-    /* tape */
-    content: '';
-    position: absolute;
-    top: -10px; left: 50%;
-    transform: translateX(-50%) rotate(-3deg);
-    width: 70px; height: 22px;
-    background: rgba(255, 240, 180, .55);
-    box-shadow: 0 2px 6px rgba(0,0,0,.15);
-  }
-
-  /* Audio player (vintage radio) */
-  .radio {
-    position: fixed;
-    bottom: 22px; right: 22px;
-    z-index: 6;
-    background: linear-gradient(180deg, #5a3a1c, #3a230f);
-    border-radius: 18px;
-    padding: 14px 18px;
-    color: #fff8e0;
-    display: flex; align-items: center; gap: 14px;
-    box-shadow: 0 10px 30px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.15);
-    border: 2px solid #2a1a0a;
-    max-width: 90vw;
-  }
-  .radio .speaker {
-    width: 36px; height: 36px;
-    border-radius: 50%;
+  /* ==========================================================
+     THEME — MUMBAI (Marine Drive sunset / first-date vibes)
+     ========================================================== */
+  .theme-mumbai {
     background:
-      radial-gradient(circle, #1a0e04 38%, transparent 40%),
-      repeating-radial-gradient(circle, #1a0e04 0 1px, transparent 1px 4px),
-      #c19a5b;
-    border: 3px solid #2a1a0a;
-    box-shadow: inset 0 0 8px rgba(0,0,0,.5);
+      linear-gradient(180deg, #0c0a2a 0%, #2a1850 22%, #6b2a6a 42%, #c44a55 58%, #ee8a45 70%, #1f2a55 78%, #0d1a3c 100%);
   }
-  .radio .controls { display: flex; align-items: center; gap: 10px; }
-  .radio .play-btn {
-    width: 38px; height: 38px;
-    border-radius: 50%;
-    background: linear-gradient(180deg, #d8a655, #a87637);
-    color: #2a1a0a;
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 3px 0 #5a3a1c, inset 0 1px 0 rgba(255,255,255,.4);
-    font-size: 16px;
+  .theme-mumbai .stars {
+    position: absolute; inset: 0; height: 38%;
+    background-image:
+      radial-gradient(1px 1px at 8% 8%, #fff, transparent 60%),
+      radial-gradient(1px 1px at 22% 14%, #fff, transparent 60%),
+      radial-gradient(1.4px 1.4px at 36% 6%, #fff, transparent 60%),
+      radial-gradient(1px 1px at 54% 18%, #fff, transparent 60%),
+      radial-gradient(1.2px 1.2px at 68% 10%, #fff, transparent 60%),
+      radial-gradient(1px 1px at 82% 14%, #fff, transparent 60%),
+      radial-gradient(1.4px 1.4px at 92% 8%, #fff, transparent 60%),
+      radial-gradient(1px 1px at 12% 22%, #fff, transparent 60%),
+      radial-gradient(1px 1px at 44% 12%, #fff, transparent 60%);
+    opacity: .8; animation: twinkle 5s ease-in-out infinite;
   }
-  .radio .play-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #5a3a1c; }
-  .radio .title {
-    font-family: 'Caveat', cursive;
-    font-size: 18px;
-    line-height: 1;
-    color: #ffe9b8;
-    max-width: 200px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  .theme-mumbai .moon {
+    position: absolute; top: 6%; right: 14%;
+    width: 80px; height: 80px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #fff8e0, #ffd078 70%, #c98a30);
+    box-shadow: 0 0 70px rgba(255, 200, 120, .55);
+  }
+  /* Mumbai skyline + sea backdrop */
+  .theme-mumbai svg.skyline {
+    position: absolute; bottom: 0; left: 0;
+    width: 100%; height: 56%;
   }
 
-  /* Lightbox */
+  /* Queen's Necklace — curved arc of lights */
+  .theme-mumbai .necklace {
+    position: absolute;
+    left: 0; right: 0; bottom: 38%;
+    height: 60px; pointer-events: none;
+  }
+  .theme-mumbai .necklace .bead {
+    position: absolute;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #ffd56a;
+    box-shadow: 0 0 8px #ffd56a, 0 0 14px rgba(255,180,80,.6);
+    animation: necklace-pulse 3s ease-in-out infinite;
+  }
+  @keyframes necklace-pulse {
+    0%,100% { opacity: .9; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.15); }
+  }
+
+  /* Decorative emojis / icons */
+  .theme-mumbai .deco {
+    position: absolute; pointer-events: none;
+    font-size: 36px; filter: drop-shadow(0 4px 10px rgba(0,0,0,.35));
+  }
+  .theme-mumbai .deco.bike { left: 4%;  bottom: 6%;  font-size: 56px; animation: bob 4s ease-in-out infinite; }
+  .theme-mumbai .deco.chai { right: 4%; bottom: 18%; font-size: 44px; animation: bob 3.4s ease-in-out infinite; }
+  .theme-mumbai .deco.dog  { right: 14%; bottom: 6%; font-size: 52px; animation: bob 4.6s ease-in-out infinite reverse; }
+  .theme-mumbai .deco.reel { left: 6%;  top: 18%;    font-size: 38px; animation: spin 22s linear infinite; opacity: .85; }
+  .theme-mumbai .deco.food { left: 28%; bottom: 5%;  font-size: 40px; animation: bob 4s ease-in-out infinite; }
+  .theme-mumbai .deco.heart{ right: 8%; top: 22%;    font-size: 30px; animation: heart-beat 1.6s ease-in-out infinite; color: #ff6b8a; }
+  @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  @keyframes heart-beat { 0%,100% { transform: scale(1); } 25% { transform: scale(1.18); } 50% { transform: scale(.95); } 75% { transform: scale(1.1); } }
+
+  .theme-mumbai .album-header { padding-bottom: 4px; }
+  .theme-mumbai .album-title {
+    font-family: 'Pacifico', cursive;
+    font-size: clamp(40px, 5vw, 64px);
+    background: linear-gradient(90deg, #ffd56a, #ff8aaa, #ffd56a);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    text-shadow: 0 4px 22px rgba(255, 120, 80, .25);
+  }
+  .theme-mumbai .album-subtitle {
+    color: #ffe8d9; font-family: 'Playfair Display', serif;
+    font-style: italic; font-size: 17px; letter-spacing: 1.5px;
+  }
+  .theme-mumbai .back-btn {
+    background: linear-gradient(180deg, #ff7a8a, #c2415a);
+    color: #fff8e0; box-shadow: 0 6px 0 #7a2238, 0 10px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.2);
+  }
+  .theme-mumbai .back-btn:active { box-shadow: 0 2px 0 #7a2238, 0 4px 12px rgba(0,0,0,.35); }
+
+  /* Movie-still photo frames */
+  .theme-mumbai .polaroid {
+    background: #1d1429;
+    padding: 8px 8px 30px;
+    box-shadow:
+      0 14px 30px rgba(0,0,0,.55),
+      0 0 0 1px rgba(255, 213, 106, .35),
+      inset 0 0 0 2px #0a0716;
+    border-radius: 4px;
+  }
+  .theme-mumbai .polaroid::before {
+    /* gold corner sparkle */
+    content: '✦';
+    background: transparent; box-shadow: none;
+    color: #ffd56a; font-size: 18px;
+    width: auto; height: auto;
+    top: 4px; left: 6px; transform: rotate(0);
+    text-shadow: 0 0 8px rgba(255,213,106,.6);
+  }
+  .theme-mumbai .polaroid::after {
+    content: '✦'; position: absolute; top: 4px; right: 8px;
+    color: #ffd56a; font-size: 18px;
+    text-shadow: 0 0 8px rgba(255,213,106,.6);
+  }
+  .theme-mumbai .polaroid .caption {
+    color: #ffd56a;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px; letter-spacing: 2px;
+  }
+
+  /* Mumbai audio radio — neon */
+  .theme-mumbai .radio {
+    background: linear-gradient(180deg, #1a0a2e, #2a0a30);
+    border-color: #ffd56a;
+    box-shadow: 0 0 20px rgba(255, 138, 170, .35), 0 10px 30px rgba(0,0,0,.5);
+  }
+  .theme-mumbai .radio .speaker {
+    background:
+      radial-gradient(circle, #1a0a2e 38%, transparent 40%),
+      repeating-radial-gradient(circle, #1a0a2e 0 1px, transparent 1px 4px),
+      #ff8aaa;
+    border-color: #c2415a;
+  }
+  .theme-mumbai .radio .play-btn {
+    background: linear-gradient(180deg, #ffd56a, #d99030);
+    box-shadow: 0 3px 0 #7a4a10, inset 0 1px 0 rgba(255,255,255,.4);
+  }
+  .theme-mumbai .radio .title { color: #ffd56a; font-family: 'Caveat', cursive; }
+
+  /* ==========================================================
+     Lightbox
+     ========================================================== */
   .lightbox {
     position: fixed; inset: 0;
     background: rgba(5,10,20,.92);
     display: flex; align-items: center; justify-content: center;
-    z-index: 30;
-    opacity: 0; visibility: hidden;
+    z-index: 30; opacity: 0; visibility: hidden;
     transition: opacity .3s ease;
   }
   .lightbox.open { opacity: 1; visibility: visible; }
-  .lightbox img {
-    max-width: 90vw; max-height: 88vh;
-    border-radius: 6px;
-    box-shadow: 0 20px 60px rgba(0,0,0,.7);
-  }
+  .lightbox img { max-width: 90vw; max-height: 88vh; border-radius: 6px; box-shadow: 0 20px 60px rgba(0,0,0,.7); }
   .lightbox .close {
     position: absolute; top: 22px; right: 28px;
     color: #fff; font-size: 30px;
-    width: 44px; height: 44px;
-    border-radius: 50%;
+    width: 44px; height: 44px; border-radius: 50%;
     background: rgba(255,255,255,.1);
     display: flex; align-items: center; justify-content: center;
   }
   .lightbox .nav {
-    position: absolute;
-    top: 50%; transform: translateY(-50%);
-    color: #fff;
-    width: 56px; height: 56px;
-    border-radius: 50%;
+    position: absolute; top: 50%; transform: translateY(-50%);
+    color: #fff; width: 56px; height: 56px; border-radius: 50%;
     background: rgba(255,255,255,.08);
     display: flex; align-items: center; justify-content: center;
-    font-size: 30px;
-    transition: background .2s;
+    font-size: 30px; transition: background .2s;
   }
   .lightbox .nav:hover { background: rgba(255,255,255,.2); }
   .lightbox .prev { left: 24px; }
   .lightbox .next { right: 24px; }
-
-  /* Page entrance fade for album view */
-  #trekking.active .album-header,
-  #trekking.active .gallery,
-  #trekking.active .radio {
-    animation: rise-in .9s ease both;
-  }
-  #trekking.active .gallery { animation-delay: .12s; }
-  #trekking.active .radio { animation-delay: .24s; }
-  @keyframes rise-in {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
 </style>
 </head>
 <body>
 
 <!-- =========================================================
-     HOME — SKY / CLOUDS
+     HOME — Sky / Clouds
      ========================================================= -->
 <section id="home" class="view active">
   <div class="sun"></div>
-
-  <!-- Ambient drifting clouds (decorative) -->
   <div class="ambient-cloud" style="top: 18%; animation-duration: 80s; transform: scale(.7);"></div>
   <div class="ambient-cloud" style="top: 38%; animation-duration: 110s; animation-delay: -30s; transform: scale(.9); opacity:.6;"></div>
   <div class="ambient-cloud" style="top: 62%; animation-duration: 95s; animation-delay: -60s; transform: scale(.55); opacity:.75;"></div>
   <div class="ambient-cloud" style="top: 80%; animation-duration: 70s; animation-delay: -20s; transform: scale(.4); opacity:.5;"></div>
-
-  <!-- Birds -->
   <div class="bird" style="top: 22%; animation-delay: -5s;">~^~ ~^~</div>
   <div class="bird" style="top: 14%; animation-delay: -18s; font-size: 12px;">~^~</div>
 
@@ -520,69 +498,191 @@
 
 
 <!-- =========================================================
-     TREKKING ALBUM
+     CLOUD theme (default)
      ========================================================= -->
-<section id="trekking" class="view">
-  <!-- Scenic backdrop -->
+<section id="theme-cloud" class="view theme-page theme-cloud">
+  <div class="scene">
+    <div class="sun"></div>
+    <div class="ambient-cloud" style="top: 16%; animation-duration: 90s; transform: scale(.7);"></div>
+    <div class="ambient-cloud" style="top: 36%; animation-duration: 120s; animation-delay: -30s; transform: scale(.9); opacity:.6;"></div>
+    <div class="ambient-cloud" style="top: 60%; animation-duration: 95s; animation-delay: -60s; transform: scale(.55); opacity:.7;"></div>
+    <div class="ambient-cloud" style="top: 82%; animation-duration: 70s; animation-delay: -20s; transform: scale(.4); opacity:.5;"></div>
+  </div>
+  <header class="album-header">
+    <div>
+      <h2 class="album-title" data-album-title>Memories</h2>
+      <p class="album-subtitle">a chapter from the sky</p>
+    </div>
+    <button class="back-btn" data-back>← Back to clouds</button>
+  </header>
+  <div class="gallery"><div class="gallery-grid" data-gallery-grid></div></div>
+  <div class="radio" data-audio-radio style="display:none;">
+    <div class="speaker"></div>
+    <button class="play-btn" data-play>▶</button>
+    <div class="title" data-audio-title>Soundtrack</div>
+    <audio data-audio-el preload="metadata"></audio>
+  </div>
+</section>
+
+
+<!-- =========================================================
+     TREKKING theme
+     ========================================================= -->
+<section id="theme-trekking" class="view theme-page theme-trekking">
   <div class="scene">
     <div class="stars"></div>
     <div class="moon"></div>
-
-    <!-- Mountains layered -->
-    <svg class="mountains" viewBox="0 0 1600 700" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-      <!-- distant range -->
+    <svg viewBox="0 0 1600 700" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="position:absolute; bottom:0; left:0; width:100%; height:65%;">
       <path d="M0,500 L150,360 L280,440 L420,300 L560,420 L720,320 L880,440 L1040,330 L1200,460 L1360,360 L1500,440 L1600,400 L1600,700 L0,700 Z" fill="#2d4a6e" opacity="0.6"/>
-      <!-- mid range with snow caps -->
       <path d="M0,560 L120,440 L240,540 L380,360 L520,500 L680,380 L840,520 L980,400 L1140,540 L1300,420 L1460,540 L1600,480 L1600,700 L0,700 Z" fill="#1e3553"/>
-      <!-- snow caps -->
       <path d="M340,400 L380,360 L420,400 L400,415 L380,395 Z M640,420 L680,380 L720,420 L700,435 L680,415 Z M940,440 L980,400 L1020,440 L1000,455 L980,435 Z" fill="#dfe9f4" opacity=".95"/>
-      <!-- front range with trees -->
       <path d="M0,640 L100,540 L220,620 L360,500 L520,600 L680,520 L840,620 L1000,520 L1180,620 L1340,540 L1500,620 L1600,580 L1600,700 L0,700 Z" fill="#10243d"/>
-      <!-- ground -->
       <path d="M0,660 L1600,660 L1600,700 L0,700 Z" fill="#3a2818"/>
     </svg>
-
-    <!-- Pine trees scattered -->
     <svg style="position:absolute; bottom: 6%; left: 18%; width: 50px; opacity:.85;" viewBox="0 0 50 90"><polygon points="25,5 8,40 18,40 6,65 22,65 14,85 36,85 28,65 44,65 32,40 42,40" fill="#0b1d12"/><rect x="22" y="83" width="6" height="10" fill="#3a230f"/></svg>
     <svg style="position:absolute; bottom: 9%; left: 30%; width: 36px; opacity:.85;" viewBox="0 0 50 90"><polygon points="25,5 8,40 18,40 6,65 22,65 14,85 36,85 28,65 44,65 32,40 42,40" fill="#0a1810"/><rect x="22" y="83" width="6" height="10" fill="#3a230f"/></svg>
     <svg style="position:absolute; bottom: 7%; right: 22%; width: 42px; opacity:.85;" viewBox="0 0 50 90"><polygon points="25,5 8,40 18,40 6,65 22,65 14,85 36,85 28,65 44,65 32,40 42,40" fill="#0b1d12"/><rect x="22" y="83" width="6" height="10" fill="#3a230f"/></svg>
     <svg style="position:absolute; bottom: 8.5%; right: 35%; width: 30px; opacity:.85;" viewBox="0 0 50 90"><polygon points="25,5 8,40 18,40 6,65 22,65 14,85 36,85 28,65 44,65 32,40 42,40" fill="#0a1810"/><rect x="22" y="83" width="6" height="10" fill="#3a230f"/></svg>
-
-    <!-- Tent silhouette -->
     <svg style="position:absolute; bottom: 7%; left: 12%; width: 110px;" viewBox="0 0 120 80">
       <polygon points="60,5 110,72 10,72" fill="#c44d2a" stroke="#2a1505" stroke-width="2"/>
       <polygon points="60,5 60,72 10,72" fill="#a23a1d"/>
       <polygon points="60,18 78,72 42,72" fill="#1a0f08"/>
     </svg>
-
-    <!-- Campfire -->
     <div class="campfire">
       <div class="flame s2"></div>
       <div class="flame"></div>
       <div class="logs"></div>
     </div>
   </div>
+  <header class="album-header">
+    <div>
+      <h2 class="album-title" data-album-title>Sandan Valley</h2>
+      <p class="album-subtitle">a trek through clouds and pines</p>
+    </div>
+    <button class="back-btn" data-back>← Back to clouds</button>
+  </header>
+  <div class="gallery"><div class="gallery-grid" data-gallery-grid></div></div>
+  <div class="radio" data-audio-radio style="display:none;">
+    <div class="speaker"></div>
+    <button class="play-btn" data-play>▶</button>
+    <div class="title" data-audio-title>Campfire tune</div>
+    <audio data-audio-el preload="metadata"></audio>
+  </div>
+</section>
+
+
+<!-- =========================================================
+     MUMBAI theme — Marine Drive · First Date
+     ========================================================= -->
+<section id="theme-mumbai" class="view theme-page theme-mumbai">
+  <div class="scene">
+    <div class="stars"></div>
+    <div class="moon"></div>
+
+    <!-- Mumbai skyline + sea -->
+    <svg class="skyline" viewBox="0 0 1600 560" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- sea -->
+      <defs>
+        <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"  stop-color="#1a2a55"/>
+          <stop offset="40%" stop-color="#0e1a3e"/>
+          <stop offset="100%" stop-color="#070b1d"/>
+        </linearGradient>
+      </defs>
+      <rect x="0" y="280" width="1600" height="280" fill="url(#sea)"/>
+      <!-- shimmering reflection -->
+      <g opacity=".55">
+        <ellipse cx="200" cy="320" rx="120" ry="2.2" fill="#ffd56a"/>
+        <ellipse cx="420" cy="338" rx="160" ry="2"   fill="#ffb070"/>
+        <ellipse cx="680" cy="316" rx="200" ry="2.6" fill="#ffd56a"/>
+        <ellipse cx="980" cy="334" rx="180" ry="2"   fill="#ffc46a"/>
+        <ellipse cx="1280" cy="320" rx="180" ry="2.4" fill="#ffd56a"/>
+        <ellipse cx="1500" cy="340" rx="100" ry="2" fill="#ffb070"/>
+      </g>
+      <!-- distant city silhouette -->
+      <g fill="#0a0b1e">
+        <!-- left buildings -->
+        <rect x="0"   y="200" width="60" height="80"/>
+        <rect x="55"  y="180" width="42" height="100"/>
+        <rect x="95"  y="160" width="34" height="120"/>
+        <rect x="125" y="195" width="60" height="85"/>
+        <rect x="180" y="170" width="40" height="110"/>
+        <rect x="215" y="145" width="48" height="135"/>
+        <rect x="258" y="180" width="40" height="100"/>
+        <rect x="295" y="158" width="56" height="122"/>
+        <rect x="348" y="190" width="42" height="90"/>
+        <rect x="388" y="170" width="40" height="110"/>
+        <!-- dome (Gateway / Taj-ish) -->
+        <rect x="430" y="200" width="80" height="80"/>
+        <path d="M430,200 q40,-50 80,0 Z"/>
+        <rect x="465" y="160" width="10" height="40"/>
+        <circle cx="470" cy="156" r="6"/>
+        <!-- middle buildings -->
+        <rect x="525" y="186" width="42" height="94"/>
+        <rect x="565" y="170" width="46" height="110"/>
+        <rect x="612" y="148" width="38" height="132"/>
+        <rect x="650" y="178" width="50" height="102"/>
+        <rect x="702" y="160" width="40" height="120"/>
+        <!-- tall tower (Antilia-ish) -->
+        <rect x="744" y="100" width="42" height="180"/>
+        <rect x="752" y="92"  width="10" height="12"/>
+        <rect x="775" y="90"  width="6"  height="12"/>
+        <rect x="789" y="170" width="32" height="110"/>
+        <rect x="823" y="190" width="46" height="90"/>
+        <rect x="870" y="160" width="40" height="120"/>
+        <rect x="912" y="180" width="48" height="100"/>
+        <rect x="962" y="165" width="36" height="115"/>
+        <rect x="1000" y="190" width="52" height="90"/>
+        <rect x="1054" y="170" width="40" height="110"/>
+        <rect x="1098" y="150" width="44" height="130"/>
+        <rect x="1144" y="180" width="40" height="100"/>
+        <!-- right cluster -->
+        <rect x="1186" y="165" width="44" height="115"/>
+        <rect x="1232" y="195" width="56" height="85"/>
+        <rect x="1290" y="172" width="38" height="108"/>
+        <rect x="1330" y="148" width="48" height="132"/>
+        <rect x="1380" y="185" width="42" height="95"/>
+        <rect x="1424" y="170" width="46" height="110"/>
+        <rect x="1472" y="190" width="40" height="90"/>
+        <rect x="1514" y="160" width="50" height="120"/>
+        <rect x="1566" y="185" width="34" height="95"/>
+      </g>
+      <!-- promenade strip in front of sea -->
+      <rect x="0" y="278" width="1600" height="4" fill="#3a2a18" opacity=".55"/>
+      <!-- palm trees -->
+      <g>
+        <rect x="68" y="220" width="6" height="60" fill="#1a0d04"/>
+        <path d="M71,222 q-30,-18 -50,-6 q22,-2 38,8 z M71,222 q30,-18 50,-6 q-22,-2 -38,8 z M71,220 q-12,-30 -36,-30 q14,16 26,30 z M71,220 q12,-30 36,-30 q-14,16 -26,30 z" fill="#0c2418" opacity=".9"/>
+        <rect x="1518" y="218" width="6" height="62" fill="#1a0d04"/>
+        <path d="M1521,220 q-30,-18 -50,-6 q22,-2 38,8 z M1521,220 q30,-18 50,-6 q-22,-2 -38,8 z M1521,218 q-12,-30 -36,-30 q14,16 26,30 z M1521,218 q12,-30 36,-30 q-14,16 -26,30 z" fill="#0c2418" opacity=".9"/>
+      </g>
+    </svg>
+
+    <!-- Queen's Necklace beads -->
+    <div class="necklace" id="necklace"></div>
+
+    <!-- Decorative tokens -->
+    <div class="deco reel">🎞️</div>
+    <div class="deco heart">❤</div>
+    <div class="deco bike">🛵</div>
+    <div class="deco chai">☕</div>
+    <div class="deco food">🍔</div>
+    <div class="deco dog">🐕</div>
+  </div>
 
   <header class="album-header">
     <div>
-      <h2 class="album-title" id="trekTitle">Sandan Valley</h2>
-      <p class="album-subtitle" id="trekSubtitle">A trek through clouds and pines</p>
+      <h2 class="album-title" data-album-title>First Date</h2>
+      <p class="album-subtitle">MARINE DRIVE · MUMBAI MERI JAAN</p>
     </div>
-    <button class="back-btn" id="backBtn">← Back to clouds</button>
+    <button class="back-btn" data-back>← Back to clouds</button>
   </header>
-
-  <div class="gallery">
-    <div class="gallery-grid" id="trekGrid"></div>
-  </div>
-
-  <!-- Audio player (shown only if audio present) -->
-  <div class="radio" id="audioRadio" style="display:none;">
+  <div class="gallery"><div class="gallery-grid" data-gallery-grid></div></div>
+  <div class="radio" data-audio-radio style="display:none;">
     <div class="speaker"></div>
-    <div class="controls">
-      <button class="play-btn" id="playBtn">▶</button>
-      <div class="title" id="audioTitle">Campfire tune</div>
-    </div>
-    <audio id="audioEl" preload="metadata"></audio>
+    <button class="play-btn" data-play>▶</button>
+    <div class="title" data-audio-title>City lights</div>
+    <audio data-audio-el preload="metadata"></audio>
   </div>
 </section>
 
@@ -601,45 +701,40 @@
   /* =========================================================
      App logic
      ========================================================= */
-  const $ = (sel, root = document) => root.querySelector(sel);
+  const $  = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
-  const views = { home: $('#home'), trekking: $('#trekking') };
-  function showView(name) {
-    Object.values(views).forEach(v => v.classList.remove('active'));
-    views[name].classList.add('active');
+  const viewIds = ['home', 'theme-cloud', 'theme-trekking', 'theme-mumbai'];
+  function showView(id) {
+    viewIds.forEach(v => {
+      const el = document.getElementById(v);
+      if (el) el.classList.toggle('active', v === id);
+    });
   }
 
-  /* --- Home: render memory clouds --- */
-  const cloudStage = $('#cloudStage');
-  // SVG path for a fluffy cloud shape (viewBox 280x150)
+  /* ----- Memory clouds on home ----- */
   const CLOUD_SVG = `
     <svg class="cloud-svg" viewBox="0 0 280 150" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
       <defs>
         <radialGradient id="cg__ID__" cx="50%" cy="35%" r="65%">
-          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="0%"  stop-color="#ffffff"/>
           <stop offset="70%" stop-color="#f3f9ff"/>
           <stop offset="100%" stop-color="#cfe2f4"/>
         </radialGradient>
       </defs>
       <path fill="url(#cg__ID__)" d="
-        M50,110
-        C20,110 10,80 40,70
-        C30,40 70,25 95,45
-        C105,20 145,15 165,40
-        C190,20 230,40 225,70
-        C260,72 270,110 240,118
-        C250,140 200,150 170,135
-        C160,150 110,150 100,130
-        C75,150 35,140 50,110 Z
+        M50,110 C20,110 10,80 40,70 C30,40 70,25 95,45 C105,20 145,15 165,40
+        C190,20 230,40 225,70 C260,72 270,110 240,118 C250,140 200,150 170,135
+        C160,150 110,150 100,130 C75,150 35,140 50,110 Z
       "/>
     </svg>
   `;
 
   function renderClouds() {
-    cloudStage.innerHTML = '';
+    const stage = $('#cloudStage');
+    stage.innerHTML = '';
     if (!Array.isArray(ALBUMS) || ALBUMS.length === 0) {
-      cloudStage.innerHTML = '<p style="color:#fff;font-family:Caveat,cursive;font-size:24px;">No memories yet — add a folder inside Images/ and re-run generate.sh</p>';
+      stage.innerHTML = '<p style="color:#fff;font-family:Caveat,cursive;font-size:24px;">No memories yet — add a folder inside Images/ and re-run generate.sh</p>';
       return;
     }
     ALBUMS.forEach((album, idx) => {
@@ -647,9 +742,9 @@
       el.className = 'memory-cloud';
       el.style.animationDelay = `${(idx * 0.6) % 4}s`;
       el.innerHTML = CLOUD_SVG.replaceAll('__ID__', 'c' + idx) +
-        `<div class="cloud-label">${escapeHtml(album.name)}</div>`;
+                     `<div class="cloud-label">${escapeHtml(album.name)}</div>`;
       el.addEventListener('click', () => openAlbum(album, el));
-      cloudStage.appendChild(el);
+      stage.appendChild(el);
     });
   }
 
@@ -659,23 +754,29 @@
     }[ch]));
   }
 
-  /* --- Open an album with cloud-zoom transition --- */
+  /* ----- Open an album with cloud-zoom transition ----- */
   function openAlbum(album, cloudEl) {
     cloudEl.classList.add('zooming');
-    // wait for cloud zoom, then transition view
     setTimeout(() => {
-      renderAlbum(album);
-      showView(album.theme === 'trekking' ? 'trekking' : 'trekking'); // only trekking for now
-      // remove zoom class after view transition
+      const requested = `theme-${album.theme || 'cloud'}`;
+      const themeId = document.getElementById(requested) ? requested : 'theme-cloud';
+      renderAlbum(album, themeId);
+      showView(themeId);
       setTimeout(() => cloudEl.classList.remove('zooming'), 1000);
     }, 600);
   }
 
-  /* --- Render trekking album --- */
-  function renderAlbum(album) {
-    $('#trekTitle').textContent = album.name;
-    const grid = $('#trekGrid');
+  /* ----- Render album into the active theme section ----- */
+  function renderAlbum(album, themeId) {
+    const root = document.getElementById(themeId);
+    if (!root) return;
+
+    const titleEl = root.querySelector('[data-album-title]');
+    if (titleEl) titleEl.textContent = album.name;
+
+    const grid = root.querySelector('[data-gallery-grid]');
     grid.innerHTML = '';
+
     const rotations = [-3, -1.5, 1, 2.5, -2, 0.5, 1.8, -1];
     album.images.forEach((src, i) => {
       const card = document.createElement('div');
@@ -691,22 +792,21 @@
     });
 
     // Audio
-    const radio = $('#audioRadio');
-    const audioEl = $('#audioEl');
-    if (album.audio) {
+    const radio = root.querySelector('[data-audio-radio]');
+    const audioEl = root.querySelector('[data-audio-el]');
+    if (album.audio && radio && audioEl) {
       radio.style.display = 'flex';
       audioEl.src = encodeURI(album.audio);
-      $('#audioTitle').textContent = friendlyName(album.audio);
-    } else {
+      const audioTitle = root.querySelector('[data-audio-title]');
+      if (audioTitle) audioTitle.textContent = friendlyName(album.audio);
+    } else if (radio) {
       radio.style.display = 'none';
-      audioEl.pause();
-      audioEl.src = '';
+      if (audioEl) { audioEl.pause(); audioEl.src = ''; }
     }
   }
 
   function friendlyName(path) {
     const base = path.split('/').pop().replace(/\.[^.]+$/, '');
-    // Try to format dates from PXL_20260314_xxx style filenames
     const m = base.match(/^PXL_(\d{4})(\d{2})(\d{2})/);
     if (m) {
       const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -715,45 +815,35 @@
     return base.replace(/[_-]+/g, ' ');
   }
 
-  /* --- Back button --- */
-  $('#backBtn').addEventListener('click', () => {
-    // pause audio when leaving
-    const audioEl = $('#audioEl');
-    audioEl.pause();
-    $('#playBtn').textContent = '▶';
+  /* ----- Back button (works for any theme) ----- */
+  document.addEventListener('click', (e) => {
+    const back = e.target.closest('[data-back]');
+    if (!back) return;
+    // Pause any audio in any theme
+    $$('audio[data-audio-el]').forEach(a => a.pause());
+    $$('[data-play]').forEach(b => b.textContent = '▶');
     showView('home');
   });
 
-  /* --- Audio play/pause --- */
-  const playBtn = $('#playBtn');
-  playBtn.addEventListener('click', () => {
-    const audioEl = $('#audioEl');
-    if (audioEl.paused) {
-      audioEl.play().catch(() => {});
-      playBtn.textContent = '❚❚';
-    } else {
-      audioEl.pause();
-      playBtn.textContent = '▶';
-    }
+  /* ----- Play/pause buttons (works for any theme) ----- */
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-play]');
+    if (!btn) return;
+    const root = btn.closest('.theme-page');
+    if (!root) return;
+    const audioEl = root.querySelector('[data-audio-el]');
+    if (!audioEl) return;
+    if (audioEl.paused) { audioEl.play().catch(()=>{}); btn.textContent = '❚❚'; }
+    else                { audioEl.pause();              btn.textContent = '▶'; }
   });
-  $('#audioEl').addEventListener('ended', () => { playBtn.textContent = '▶'; });
 
-  /* --- Lightbox --- */
+  /* ----- Lightbox ----- */
   const lb = $('#lightbox');
   const lbImg = $('#lbImg');
-  let lbList = [];
-  let lbIdx = 0;
-  function openLightbox(list, idx) {
-    lbList = list; lbIdx = idx;
-    lbImg.src = encodeURI(list[idx]);
-    lb.classList.add('open');
-  }
+  let lbList = []; let lbIdx = 0;
+  function openLightbox(list, idx) { lbList = list; lbIdx = idx; lbImg.src = encodeURI(list[idx]); lb.classList.add('open'); }
   function closeLightbox() { lb.classList.remove('open'); lbImg.src = ''; }
-  function lbStep(n) {
-    if (lbList.length === 0) return;
-    lbIdx = (lbIdx + n + lbList.length) % lbList.length;
-    lbImg.src = encodeURI(lbList[lbIdx]);
-  }
+  function lbStep(n) { if (!lbList.length) return; lbIdx = (lbIdx + n + lbList.length) % lbList.length; lbImg.src = encodeURI(lbList[lbIdx]); }
   $('#lbClose').addEventListener('click', closeLightbox);
   $('#lbPrev').addEventListener('click', () => lbStep(-1));
   $('#lbNext').addEventListener('click', () => lbStep(1));
@@ -765,8 +855,36 @@
     if (e.key === 'ArrowRight') lbStep(1);
   });
 
-  /* --- Init --- */
+  /* ----- Build Mumbai Queen's Necklace lights ----- */
+  function buildNecklace() {
+    const container = document.getElementById('necklace');
+    if (!container) return;
+    const count = 80;
+    const w = window.innerWidth;
+    for (let i = 0; i < count; i++) {
+      const bead = document.createElement('div');
+      bead.className = 'bead';
+      const t = i / (count - 1);            // 0..1
+      // Curve: x linear, y as gentle parabola (low in middle, higher at ends)
+      const x = t * w;
+      const y = Math.sin(t * Math.PI) * -36 + 50; // 50px down at edges, ~14px down in middle
+      bead.style.left = x + 'px';
+      bead.style.top  = y + 'px';
+      bead.style.animationDelay = (Math.random() * 3) + 's';
+      // bigger near middle (perspective close)
+      const size = 5 + Math.sin(t * Math.PI) * 4;
+      bead.style.width = bead.style.height = size + 'px';
+      container.appendChild(bead);
+    }
+  }
+  window.addEventListener('resize', () => {
+    const n = document.getElementById('necklace');
+    if (n) { n.innerHTML = ''; buildNecklace(); }
+  });
+
+  /* ----- Init ----- */
   renderClouds();
+  buildNecklace();
 </script>
 </body>
 </html>

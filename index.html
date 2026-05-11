@@ -1,0 +1,772 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Memories on the Cloud</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Pacifico&family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  /* ==========================================================
+     Core
+     ========================================================== */
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+  body {
+    font-family: 'Quicksand', system-ui, sans-serif;
+    color: #1d2535;
+    background: #cfe9ff;
+    -webkit-font-smoothing: antialiased;
+    user-select: none;
+  }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+  img { display: block; max-width: 100%; }
+
+  .view {
+    position: fixed; inset: 0;
+    opacity: 0; visibility: hidden;
+    transition: opacity .9s ease;
+    overflow: hidden;
+  }
+  .view.active { opacity: 1; visibility: visible; }
+
+  /* ==========================================================
+     HOME — Sky + Clouds
+     ========================================================== */
+  #home {
+    background:
+      radial-gradient(ellipse at 80% 15%, #fff5c8 0%, rgba(255,245,200,0) 45%),
+      linear-gradient(180deg, #4ea7e8 0%, #88c8f0 38%, #c7e6f7 72%, #f4e8c6 100%);
+  }
+
+  /* Sun */
+  .sun {
+    position: absolute;
+    top: 6%; right: 9%;
+    width: 140px; height: 140px;
+    background: radial-gradient(circle, #fff7c0 0%, #ffe27a 45%, rgba(255,200,80,0) 70%);
+    border-radius: 50%;
+    filter: blur(1px);
+    pointer-events: none;
+    animation: sun-pulse 8s ease-in-out infinite;
+  }
+  @keyframes sun-pulse {
+    0%,100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.06); opacity: .92; }
+  }
+
+  /* Distant birds */
+  .bird {
+    position: absolute;
+    color: rgba(40,60,90,.45);
+    font-size: 14px;
+    animation: bird-fly 28s linear infinite;
+    pointer-events: none;
+  }
+  @keyframes bird-fly {
+    from { transform: translateX(-10vw); }
+    to { transform: translateX(110vw); }
+  }
+
+  /* Ambient drifting background clouds (decorative only) */
+  .ambient-cloud {
+    position: absolute;
+    width: 220px; height: 70px;
+    background: #ffffff;
+    border-radius: 60px;
+    opacity: .85;
+    filter: blur(.4px);
+    box-shadow: inset -16px -8px 32px rgba(180, 210, 235, .35);
+    pointer-events: none;
+    animation: drift 60s linear infinite;
+  }
+  .ambient-cloud::before,
+  .ambient-cloud::after {
+    content: '';
+    position: absolute;
+    background: inherit;
+    border-radius: 50%;
+  }
+  .ambient-cloud::before {
+    width: 110px; height: 110px;
+    top: -55px; left: 30px;
+  }
+  .ambient-cloud::after {
+    width: 80px; height: 80px;
+    top: -35px; right: 30px;
+  }
+  @keyframes drift {
+    from { transform: translateX(-30vw); }
+    to { transform: translateX(130vw); }
+  }
+
+  .home-title {
+    position: absolute;
+    top: 6.5vh; left: 0; right: 0;
+    text-align: center;
+    z-index: 5;
+    pointer-events: none;
+  }
+  .home-title h1 {
+    font-family: 'Pacifico', cursive;
+    font-weight: 400;
+    font-size: clamp(36px, 6vw, 68px);
+    margin: 0;
+    color: #ffffff;
+    text-shadow: 0 4px 24px rgba(60, 100, 150, .35), 0 1px 0 rgba(255,255,255,.6);
+    letter-spacing: 1px;
+  }
+  .home-title p {
+    font-family: 'Caveat', cursive;
+    font-size: clamp(18px, 2vw, 26px);
+    color: rgba(255,255,255,.95);
+    text-shadow: 0 2px 12px rgba(60, 100, 150, .25);
+    margin: 6px 0 0;
+  }
+
+  /* The memory cloud grid */
+  .cloud-stage {
+    position: absolute;
+    inset: 22vh 0 8vh 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 60px 80px;
+    padding: 0 6vw;
+    z-index: 4;
+  }
+  .memory-cloud {
+    position: relative;
+    width: 280px; height: 150px;
+    cursor: pointer;
+    transition: transform .5s cubic-bezier(.2,.7,.3,1.4), filter .5s ease;
+    animation: float 6s ease-in-out infinite;
+  }
+  .memory-cloud:nth-child(odd)  { animation-duration: 7.2s; }
+  .memory-cloud:nth-child(3n)   { animation-duration: 5.4s; }
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50%     { transform: translateY(-12px); }
+  }
+
+  .memory-cloud .cloud-svg {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    filter: drop-shadow(0 18px 30px rgba(60, 100, 150, .35));
+  }
+  .memory-cloud .cloud-label {
+    position: absolute;
+    inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    text-align: center;
+    padding: 0 30px;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: clamp(20px, 1.6vw, 26px);
+    color: #2c4063;
+    text-shadow: 0 1px 0 rgba(255,255,255,.7);
+    letter-spacing: .3px;
+  }
+  .memory-cloud:hover {
+    transform: translateY(-10px) scale(1.05);
+    filter: brightness(1.04);
+  }
+  .memory-cloud:hover .cloud-svg {
+    filter: drop-shadow(0 26px 40px rgba(60, 100, 150, .45));
+  }
+
+  /* Cloud zoom-out transition when clicked */
+  .memory-cloud.zooming {
+    animation: cloud-zoom 0.9s forwards cubic-bezier(.55,.08,.4,1.0);
+    z-index: 99;
+  }
+  @keyframes cloud-zoom {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    60% { transform: translateY(-30px) scale(2); opacity: 1; }
+    100% { transform: translateY(-100px) scale(8); opacity: 0; }
+  }
+
+  /* Footer hint */
+  .home-hint {
+    position: absolute;
+    bottom: 26px; left: 0; right: 0;
+    text-align: center;
+    font-family: 'Caveat', cursive;
+    color: rgba(40,70,110,.8);
+    font-size: 22px;
+    z-index: 4;
+    pointer-events: none;
+  }
+
+  /* ==========================================================
+     TREKKING THEME
+     ========================================================== */
+  #trekking {
+    background: linear-gradient(180deg, #0b1e3a 0%, #1d3b66 40%, #4a6a8f 70%, #6a5a3f 100%);
+  }
+
+  /* Scenic backdrop layer */
+  .scene {
+    position: absolute; inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .stars {
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 12% 15%, #fff 50%, transparent 100%),
+      radial-gradient(1px 1px at 24% 28%, #fff 50%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 38% 12%, #fff 50%, transparent 100%),
+      radial-gradient(1px 1px at 52% 22%, #fff 50%, transparent 100%),
+      radial-gradient(1.2px 1.2px at 66% 8%, #fff 50%, transparent 100%),
+      radial-gradient(1px 1px at 74% 24%, #fff 50%, transparent 100%),
+      radial-gradient(1.4px 1.4px at 88% 16%, #fff 50%, transparent 100%),
+      radial-gradient(1px 1px at 18% 6%, #fff 50%, transparent 100%),
+      radial-gradient(1px 1px at 44% 30%, #fff 50%, transparent 100%),
+      radial-gradient(1px 1px at 6% 22%, #fff 50%, transparent 100%);
+    opacity: .85;
+    animation: twinkle 4s ease-in-out infinite;
+    height: 50%;
+  }
+  @keyframes twinkle {
+    0%,100% { opacity: .85; }
+    50%     { opacity: .55; }
+  }
+  .moon {
+    position: absolute;
+    top: 8%; left: 10%;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #fff8e0, #e7d8a5 60%, #c5b687);
+    box-shadow: 0 0 60px rgba(255, 240, 200, .35);
+  }
+
+  .scene svg.mountains {
+    position: absolute;
+    bottom: 0; left: 0; width: 100%; height: 65%;
+  }
+
+  /* Campfire */
+  .campfire {
+    position: absolute;
+    left: 5%; bottom: 8%;
+    width: 90px; height: 90px;
+    z-index: 2;
+  }
+  .flame {
+    position: absolute;
+    bottom: 18px; left: 50%;
+    transform: translateX(-50%);
+    width: 26px; height: 50px;
+    border-radius: 50% 50% 35% 35% / 60% 60% 40% 40%;
+    background: radial-gradient(circle at 50% 80%, #fff3a5, #ffb13a 45%, #d8451e 80%);
+    filter: blur(.4px);
+    animation: flicker 1.2s ease-in-out infinite;
+    box-shadow: 0 0 22px rgba(255, 140, 40, .65);
+  }
+  .flame.s2 { width: 18px; height: 40px; bottom: 22px; animation-duration: .9s; opacity: .85; }
+  @keyframes flicker {
+    0%,100% { transform: translateX(-50%) scaleY(1) scaleX(1); }
+    50%     { transform: translateX(-50%) scaleY(1.1) scaleX(.9); }
+  }
+  .logs {
+    position: absolute;
+    bottom: 4px; left: 50%; transform: translateX(-50%);
+    width: 60px; height: 14px;
+    background: linear-gradient(180deg, #6c4023, #3a230f);
+    border-radius: 4px;
+    box-shadow: 0 0 22px rgba(255, 140, 40, .35);
+  }
+
+  /* Header for album */
+  .album-header {
+    position: relative;
+    z-index: 3;
+    padding: 38px 60px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .album-title {
+    color: #fff;
+    font-family: 'Caveat', cursive;
+    font-size: clamp(38px, 4.5vw, 60px);
+    line-height: 1;
+    margin: 0;
+    text-shadow: 0 3px 18px rgba(0,0,0,.4);
+  }
+  .album-subtitle {
+    color: rgba(255,255,255,.8);
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 16px;
+    margin: 6px 0 0;
+    letter-spacing: 1px;
+  }
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(180deg, #8a5a30, #6b4220);
+    color: #fff8e0;
+    font-family: 'Caveat', cursive;
+    font-size: 22px;
+    padding: 10px 22px;
+    border-radius: 26px;
+    box-shadow:
+      0 6px 0 #4a2b13,
+      0 10px 24px rgba(0,0,0,.35),
+      inset 0 1px 0 rgba(255,255,255,.2);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .back-btn:hover { transform: translateY(-2px); }
+  .back-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #4a2b13, 0 4px 12px rgba(0,0,0,.35); }
+
+  /* Photo gallery — scrapbook style */
+  .gallery {
+    position: relative;
+    z-index: 3;
+    padding: 10px 50px 160px;
+    height: calc(100% - 110px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,.3) transparent;
+  }
+  .gallery::-webkit-scrollbar { width: 10px; }
+  .gallery::-webkit-scrollbar-thumb { background: rgba(255,255,255,.25); border-radius: 10px; }
+  .gallery-grid {
+    columns: 4 280px;
+    column-gap: 26px;
+  }
+  @media (max-width: 1100px) { .gallery-grid { columns: 3 240px; } }
+  @media (max-width: 720px)  { .gallery-grid { columns: 2 180px; } }
+
+  .polaroid {
+    break-inside: avoid;
+    background: #fdfaf2;
+    padding: 12px 12px 42px;
+    margin: 0 0 26px;
+    box-shadow:
+      0 10px 24px rgba(0,0,0,.35),
+      0 1px 0 rgba(255,255,255,.6) inset;
+    transform: rotate(var(--rot, -1deg));
+    transition: transform .35s ease, box-shadow .35s ease;
+    cursor: pointer;
+    position: relative;
+  }
+  .polaroid:hover {
+    transform: rotate(0deg) scale(1.03);
+    box-shadow: 0 18px 36px rgba(0,0,0,.5);
+    z-index: 4;
+  }
+  .polaroid img {
+    width: 100%;
+    height: auto;
+    background: #ddd;
+    display: block;
+  }
+  .polaroid .caption {
+    position: absolute;
+    bottom: 8px; left: 12px; right: 12px;
+    text-align: center;
+    font-family: 'Caveat', cursive;
+    color: #5c4a32;
+    font-size: 18px;
+    line-height: 1;
+    pointer-events: none;
+  }
+  .polaroid::before {
+    /* tape */
+    content: '';
+    position: absolute;
+    top: -10px; left: 50%;
+    transform: translateX(-50%) rotate(-3deg);
+    width: 70px; height: 22px;
+    background: rgba(255, 240, 180, .55);
+    box-shadow: 0 2px 6px rgba(0,0,0,.15);
+  }
+
+  /* Audio player (vintage radio) */
+  .radio {
+    position: fixed;
+    bottom: 22px; right: 22px;
+    z-index: 6;
+    background: linear-gradient(180deg, #5a3a1c, #3a230f);
+    border-radius: 18px;
+    padding: 14px 18px;
+    color: #fff8e0;
+    display: flex; align-items: center; gap: 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.15);
+    border: 2px solid #2a1a0a;
+    max-width: 90vw;
+  }
+  .radio .speaker {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle, #1a0e04 38%, transparent 40%),
+      repeating-radial-gradient(circle, #1a0e04 0 1px, transparent 1px 4px),
+      #c19a5b;
+    border: 3px solid #2a1a0a;
+    box-shadow: inset 0 0 8px rgba(0,0,0,.5);
+  }
+  .radio .controls { display: flex; align-items: center; gap: 10px; }
+  .radio .play-btn {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(180deg, #d8a655, #a87637);
+    color: #2a1a0a;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 3px 0 #5a3a1c, inset 0 1px 0 rgba(255,255,255,.4);
+    font-size: 16px;
+  }
+  .radio .play-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #5a3a1c; }
+  .radio .title {
+    font-family: 'Caveat', cursive;
+    font-size: 18px;
+    line-height: 1;
+    color: #ffe9b8;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Lightbox */
+  .lightbox {
+    position: fixed; inset: 0;
+    background: rgba(5,10,20,.92);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 30;
+    opacity: 0; visibility: hidden;
+    transition: opacity .3s ease;
+  }
+  .lightbox.open { opacity: 1; visibility: visible; }
+  .lightbox img {
+    max-width: 90vw; max-height: 88vh;
+    border-radius: 6px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.7);
+  }
+  .lightbox .close {
+    position: absolute; top: 22px; right: 28px;
+    color: #fff; font-size: 30px;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.1);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .lightbox .nav {
+    position: absolute;
+    top: 50%; transform: translateY(-50%);
+    color: #fff;
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.08);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px;
+    transition: background .2s;
+  }
+  .lightbox .nav:hover { background: rgba(255,255,255,.2); }
+  .lightbox .prev { left: 24px; }
+  .lightbox .next { right: 24px; }
+
+  /* Page entrance fade for album view */
+  #trekking.active .album-header,
+  #trekking.active .gallery,
+  #trekking.active .radio {
+    animation: rise-in .9s ease both;
+  }
+  #trekking.active .gallery { animation-delay: .12s; }
+  #trekking.active .radio { animation-delay: .24s; }
+  @keyframes rise-in {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<!-- =========================================================
+     HOME — SKY / CLOUDS
+     ========================================================= -->
+<section id="home" class="view active">
+  <div class="sun"></div>
+
+  <!-- Ambient drifting clouds (decorative) -->
+  <div class="ambient-cloud" style="top: 18%; animation-duration: 80s; transform: scale(.7);"></div>
+  <div class="ambient-cloud" style="top: 38%; animation-duration: 110s; animation-delay: -30s; transform: scale(.9); opacity:.6;"></div>
+  <div class="ambient-cloud" style="top: 62%; animation-duration: 95s; animation-delay: -60s; transform: scale(.55); opacity:.75;"></div>
+  <div class="ambient-cloud" style="top: 80%; animation-duration: 70s; animation-delay: -20s; transform: scale(.4); opacity:.5;"></div>
+
+  <!-- Birds -->
+  <div class="bird" style="top: 22%; animation-delay: -5s;">~^~ ~^~</div>
+  <div class="bird" style="top: 14%; animation-delay: -18s; font-size: 12px;">~^~</div>
+
+  <div class="home-title">
+    <h1>Memories on the Cloud</h1>
+    <p>tap a cloud to relive a moment</p>
+  </div>
+
+  <div id="cloudStage" class="cloud-stage"></div>
+
+  <div class="home-hint">drifting through the sky&nbsp;·&nbsp;each cloud holds a story</div>
+</section>
+
+
+<!-- =========================================================
+     TREKKING ALBUM
+     ========================================================= -->
+<section id="trekking" class="view">
+  <!-- Scenic backdrop -->
+  <div class="scene">
+    <div class="stars"></div>
+    <div class="moon"></div>
+
+    <!-- Mountains layered -->
+    <svg class="mountains" viewBox="0 0 1600 700" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- distant range -->
+      <path d="M0,500 L150,360 L280,440 L420,300 L560,420 L720,320 L880,440 L1040,330 L1200,460 L1360,360 L1500,440 L1600,400 L1600,700 L0,700 Z" fill="#2d4a6e" opacity="0.6"/>
+      <!-- mid range with snow caps -->
+      <path d="M0,560 L120,440 L240,540 L380,360 L520,500 L680,380 L840,520 L980,400 L1140,540 L1300,420 L1460,540 L1600,480 L1600,700 L0,700 Z" fill="#1e3553"/>
+      <!-- snow caps -->
+      <path d="M340,400 L380,360 L420,400 L400,415 L380,395 Z M640,420 L680,380 L720,420 L700,435 L680,415 Z M940,440 L980,400 L1020,440 L1000,455 L980,435 Z" fill="#dfe9f4" opacity=".95"/>
+      <!-- front range with trees -->
+      <path d="M0,640 L100,540 L220,620 L360,500 L520,600 L680,520 L840,620 L1000,520 L1180,620 L1340,540 L1500,620 L1600,580 L1600,700 L0,700 Z" fill="#10243d"/>
+      <!-- ground -->
+      <path d="M0,660 L1600,660 L1600,700 L0,700 Z" fill="#3a2818"/>
+    </svg>
+
+    <!-- Pine trees scattered -->
+    <svg style="position:absolute; bottom: 6%; left: 18%; width: 50px; opacity:.85;" viewBox="0 0 50 90"><polygon points="25,5 8,40 18,40 6,65 22,65 14,85 36,85 28,65 44,65 32,40 42,40" fill="#0b1d12"/><rect x="22" y="83" width="6" height="10" fill="#3a230f"/></svg>
+    <svg style="position:absolute; bottom: 9%; left: 30%; width: 36px; opacity:.85;" viewBox="0 0 50 90"><polygon points="25,5 8,40 18,40 6,65 22,65 14,85 36,85 28,65 44,65 32,40 42,40" fill="#0a1810"/><rect x="22" y="83" width="6" height="10" fill="#3a230f"/></svg>
+    <svg style="position:absolute; bottom: 7%; right: 22%; width: 42px; opacity:.85;" viewBox="0 0 50 90"><polygon points="25,5 8,40 18,40 6,65 22,65 14,85 36,85 28,65 44,65 32,40 42,40" fill="#0b1d12"/><rect x="22" y="83" width="6" height="10" fill="#3a230f"/></svg>
+    <svg style="position:absolute; bottom: 8.5%; right: 35%; width: 30px; opacity:.85;" viewBox="0 0 50 90"><polygon points="25,5 8,40 18,40 6,65 22,65 14,85 36,85 28,65 44,65 32,40 42,40" fill="#0a1810"/><rect x="22" y="83" width="6" height="10" fill="#3a230f"/></svg>
+
+    <!-- Tent silhouette -->
+    <svg style="position:absolute; bottom: 7%; left: 12%; width: 110px;" viewBox="0 0 120 80">
+      <polygon points="60,5 110,72 10,72" fill="#c44d2a" stroke="#2a1505" stroke-width="2"/>
+      <polygon points="60,5 60,72 10,72" fill="#a23a1d"/>
+      <polygon points="60,18 78,72 42,72" fill="#1a0f08"/>
+    </svg>
+
+    <!-- Campfire -->
+    <div class="campfire">
+      <div class="flame s2"></div>
+      <div class="flame"></div>
+      <div class="logs"></div>
+    </div>
+  </div>
+
+  <header class="album-header">
+    <div>
+      <h2 class="album-title" id="trekTitle">Sandan Valley</h2>
+      <p class="album-subtitle" id="trekSubtitle">A trek through clouds and pines</p>
+    </div>
+    <button class="back-btn" id="backBtn">← Back to clouds</button>
+  </header>
+
+  <div class="gallery">
+    <div class="gallery-grid" id="trekGrid"></div>
+  </div>
+
+  <!-- Audio player (shown only if audio present) -->
+  <div class="radio" id="audioRadio" style="display:none;">
+    <div class="speaker"></div>
+    <div class="controls">
+      <button class="play-btn" id="playBtn">▶</button>
+      <div class="title" id="audioTitle">Campfire tune</div>
+    </div>
+    <audio id="audioEl" preload="metadata"></audio>
+  </div>
+</section>
+
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox">
+  <button class="close" id="lbClose" aria-label="Close">×</button>
+  <button class="nav prev" id="lbPrev" aria-label="Previous">‹</button>
+  <img id="lbImg" alt="" />
+  <button class="nav next" id="lbNext" aria-label="Next">›</button>
+</div>
+
+
+<script src="data.js"></script>
+<script>
+  /* =========================================================
+     App logic
+     ========================================================= */
+  const $ = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+  const views = { home: $('#home'), trekking: $('#trekking') };
+  function showView(name) {
+    Object.values(views).forEach(v => v.classList.remove('active'));
+    views[name].classList.add('active');
+  }
+
+  /* --- Home: render memory clouds --- */
+  const cloudStage = $('#cloudStage');
+  // SVG path for a fluffy cloud shape (viewBox 280x150)
+  const CLOUD_SVG = `
+    <svg class="cloud-svg" viewBox="0 0 280 150" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <radialGradient id="cg__ID__" cx="50%" cy="35%" r="65%">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="70%" stop-color="#f3f9ff"/>
+          <stop offset="100%" stop-color="#cfe2f4"/>
+        </radialGradient>
+      </defs>
+      <path fill="url(#cg__ID__)" d="
+        M50,110
+        C20,110 10,80 40,70
+        C30,40 70,25 95,45
+        C105,20 145,15 165,40
+        C190,20 230,40 225,70
+        C260,72 270,110 240,118
+        C250,140 200,150 170,135
+        C160,150 110,150 100,130
+        C75,150 35,140 50,110 Z
+      "/>
+    </svg>
+  `;
+
+  function renderClouds() {
+    cloudStage.innerHTML = '';
+    if (!Array.isArray(ALBUMS) || ALBUMS.length === 0) {
+      cloudStage.innerHTML = '<p style="color:#fff;font-family:Caveat,cursive;font-size:24px;">No memories yet — add a folder inside Images/ and re-run generate.sh</p>';
+      return;
+    }
+    ALBUMS.forEach((album, idx) => {
+      const el = document.createElement('div');
+      el.className = 'memory-cloud';
+      el.style.animationDelay = `${(idx * 0.6) % 4}s`;
+      el.innerHTML = CLOUD_SVG.replaceAll('__ID__', 'c' + idx) +
+        `<div class="cloud-label">${escapeHtml(album.name)}</div>`;
+      el.addEventListener('click', () => openAlbum(album, el));
+      cloudStage.appendChild(el);
+    });
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, ch => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[ch]));
+  }
+
+  /* --- Open an album with cloud-zoom transition --- */
+  function openAlbum(album, cloudEl) {
+    cloudEl.classList.add('zooming');
+    // wait for cloud zoom, then transition view
+    setTimeout(() => {
+      renderAlbum(album);
+      showView(album.theme === 'trekking' ? 'trekking' : 'trekking'); // only trekking for now
+      // remove zoom class after view transition
+      setTimeout(() => cloudEl.classList.remove('zooming'), 1000);
+    }, 600);
+  }
+
+  /* --- Render trekking album --- */
+  function renderAlbum(album) {
+    $('#trekTitle').textContent = album.name;
+    const grid = $('#trekGrid');
+    grid.innerHTML = '';
+    const rotations = [-3, -1.5, 1, 2.5, -2, 0.5, 1.8, -1];
+    album.images.forEach((src, i) => {
+      const card = document.createElement('div');
+      card.className = 'polaroid';
+      card.style.setProperty('--rot', rotations[i % rotations.length] + 'deg');
+      const caption = friendlyName(src);
+      card.innerHTML = `
+        <img loading="lazy" src="${encodeURI(src)}" alt="${escapeHtml(caption)}" />
+        <div class="caption">${escapeHtml(caption)}</div>
+      `;
+      card.addEventListener('click', () => openLightbox(album.images, i));
+      grid.appendChild(card);
+    });
+
+    // Audio
+    const radio = $('#audioRadio');
+    const audioEl = $('#audioEl');
+    if (album.audio) {
+      radio.style.display = 'flex';
+      audioEl.src = encodeURI(album.audio);
+      $('#audioTitle').textContent = friendlyName(album.audio);
+    } else {
+      radio.style.display = 'none';
+      audioEl.pause();
+      audioEl.src = '';
+    }
+  }
+
+  function friendlyName(path) {
+    const base = path.split('/').pop().replace(/\.[^.]+$/, '');
+    // Try to format dates from PXL_20260314_xxx style filenames
+    const m = base.match(/^PXL_(\d{4})(\d{2})(\d{2})/);
+    if (m) {
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      return `${months[parseInt(m[2],10)-1]} ${parseInt(m[3],10)}, ${m[1]}`;
+    }
+    return base.replace(/[_-]+/g, ' ');
+  }
+
+  /* --- Back button --- */
+  $('#backBtn').addEventListener('click', () => {
+    // pause audio when leaving
+    const audioEl = $('#audioEl');
+    audioEl.pause();
+    $('#playBtn').textContent = '▶';
+    showView('home');
+  });
+
+  /* --- Audio play/pause --- */
+  const playBtn = $('#playBtn');
+  playBtn.addEventListener('click', () => {
+    const audioEl = $('#audioEl');
+    if (audioEl.paused) {
+      audioEl.play().catch(() => {});
+      playBtn.textContent = '❚❚';
+    } else {
+      audioEl.pause();
+      playBtn.textContent = '▶';
+    }
+  });
+  $('#audioEl').addEventListener('ended', () => { playBtn.textContent = '▶'; });
+
+  /* --- Lightbox --- */
+  const lb = $('#lightbox');
+  const lbImg = $('#lbImg');
+  let lbList = [];
+  let lbIdx = 0;
+  function openLightbox(list, idx) {
+    lbList = list; lbIdx = idx;
+    lbImg.src = encodeURI(list[idx]);
+    lb.classList.add('open');
+  }
+  function closeLightbox() { lb.classList.remove('open'); lbImg.src = ''; }
+  function lbStep(n) {
+    if (lbList.length === 0) return;
+    lbIdx = (lbIdx + n + lbList.length) % lbList.length;
+    lbImg.src = encodeURI(lbList[lbIdx]);
+  }
+  $('#lbClose').addEventListener('click', closeLightbox);
+  $('#lbPrev').addEventListener('click', () => lbStep(-1));
+  $('#lbNext').addEventListener('click', () => lbStep(1));
+  lb.addEventListener('click', (e) => { if (e.target === lb) closeLightbox(); });
+  document.addEventListener('keydown', (e) => {
+    if (!lb.classList.contains('open')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') lbStep(-1);
+    if (e.key === 'ArrowRight') lbStep(1);
+  });
+
+  /* --- Init --- */
+  renderClouds();
+</script>
+</body>
+</html>
